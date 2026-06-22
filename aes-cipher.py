@@ -10,13 +10,9 @@ def encrypt(data):
 
     data = open(data, "rb")
     data = data.read()
-
     key = get_random_bytes(32)
-
     cipher = AES.new(key, AES.MODE_EAX)
-
     ciphertext, tag = cipher.encrypt_and_digest(data)
-
 
     with open("encrypted.bin", "wb") as f:
         f.write(tag)
@@ -25,9 +21,7 @@ def encrypt(data):
 
     return key.hex()
 
-
 def decrypt(data,key):
-
     key = bytes.fromhex(key)
 
     with open(data, "rb") as f:
