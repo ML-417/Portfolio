@@ -3,7 +3,7 @@ import subprocess
 import os
 import sys
 import logging as log
-
+#TODO: Delete files not in modlist with setting, create string of mods to copy-paste into start script
 #config
 steamcmddir = None
 moddir = None
@@ -47,5 +47,7 @@ if steamcmdlogdir:
 else:
         log.error("steamcmdlogdir was not set in config. Logs will not be deleted.\n If you have provided login data, it will be in these logs.")       #TODO: Conclusiveness of this solution has not been proven yet.
 
-#Step: Copying and renaming files into moddir - UNTESTED
-subprocess.check_call(r"cd "+ moddir +"/steamapps/workshop/content/" + gameid + " && find . -depth -type f -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \; && cp -u -r ./ ../../../..", shell=True)
+#Step: Linking and renaming files into moddir
+log.info("The next step might require you to install xutils-dev, as it uses lndir.")
+subprocess.check_call("lndir " + moddir + "/steamapps/workshop/content/107410 " + moddir, shell=True)
+subprocess.check_call("cd "+ moddir +" && find . -maxdepth 4 -type l -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;")
