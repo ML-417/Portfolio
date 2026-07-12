@@ -3,51 +3,99 @@ import subprocess
 import os
 import sys
 import logging as log
-#TODO: Delete files not in modlist with setting, create string of mods to copy-paste into start script
-#config
-steamcmddir = None
-moddir = None
-steamcmdlogdir = None
+########config##########
 gameid = None
-modlist = []
+moddir = None
+steamcmddir = None
+steamcmdlogdir = None
+modupdate = False
+modlinking = False   #Needs lndir to work
+modcleaner = False
+modrelpth = None  #Relative path from your start script to mod folder
+modstrf = False       #Prints a string for the "mods=" section of your start script. Needs modrelpth.
+modlist = []         #List of workshop item ids
+########################
 
-log.basicConfig(level=log.DEBUG, format='%(levelname)s: %(message)s')
+log.basicConfig(level=log.INFO, format="%(levelname)s: %(message)s")
 
-#Step: Downloading
-def modString():
-        if not gameid:
-                raise ValueError("Please provide a game id in the config at the start of the script.")
-        mods = ""
+
+def modString(gameid,modlist):
+    if not gameid:
+        raise ValueError("Please provide a gameid in the config at the start of the script.")
+    mods = ""
+    if modlist:
         for i in modlist:
-                mods += (" +workshop_download_item  " + gameid + " " + str(i))
-        return mods
+            mods += (" +workshop_download_item  " + gameid + " " + str(i))
+    else: log.info("modlist is empty.")
+    return mods
 
-modstr = modString()
-log.debug("Mod String: " + modstr)
+def runSteamcmd(steamcmddir, moddir, modstr):
+    print("Please enter your steam login data or continue anonymous")
+    uname = input("Username: ")
+    pword = input("Password: ")
+    if (len(uname) + len(pword)) > 1:
+        subprocess.check_call(steamcmddir + "/steamcmd.sh +force_install_dir " + moddir + " +login " + uname + " " + pword + modstr + " +quit", shell=True)
+    else:
+        log.info("You did not enter your username and password. \n Continuing with anonymous login...\n")
+        subprocess.check_call(steamcmddir + "/steamcmd.sh +force_install_dir " + moddir + " +login anonymous" + modstr + " +quit", shell=True)
 
-if steamcmddir and moddir:
-        if len(sys.argv) == 3:
-                subprocess.check_call(steamcmddir + "/steamcmd.sh +force_install_dir " + moddir + " +login " + sys.argv[1] + " " + sys.argv[2] + modstr + " +quit", shell=True)
+def delSteamcmdLogs(steamcmdlogdir):
+    logfiles = ["configstore_log.txt", "appinfo_log.txt", "content_log.txt", "connection_log.txt", "workshop_log.txt"]    #This shouldn't change.
+    for i in logfiles:
+        path = steamcmdlogdir + "/"+ i
+        if os.path.exists(path):
+            os.remove(path)
         else:
-                log.info("You did not enter your username and password as start arguments. \n Continuing with anonymous login...\n")
-                subprocess.check_call(steamcmddir + "/steamcmd.sh +force_install_dir " + moddir + " +login anonymous" + modstr + " +quit", shell=True)
-else:
-        log.error("Please fill out the config at the start of the script.")
+            log.error("Path: " + path + " Does not exist.")
 
-#Step: Deleting logs - UNTESTED
-logfiles = ["configstore_log.txt", "appinfo_log.txt", "content_log.txt", "connection_log.txt", "workshop_log.txt"]
+def linkMods(moddir, gameid):
+    log.info("The next step might require you to install xutils-dev, as it uses lndir.")
+    subprocess.check_call("lndir -silent" + moddir + "/steamapps/workshop/content/" + gameid + " " + moddir, shell=True)
+    subprocess.check_call("cd "+ moddir + r" && find . -maxdepth 4 -type l -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;", shell=True)
 
-if steamcmdlogdir:
-        for i in logfiles:
-                path = steamcmdlogdir + i
-                if os.path.exists(path):
-                        os.remove(path)
-                else:
-                        log.error("Path: " + path + " Does not exist.")
-else:
-        log.error("steamcmdlogdir was not set in config. Logs will not be deleted.\n If you have provided login data, it will be in these logs.")       #TODO: Conclusiveness of this solution has not been proven yet.
+def cleanMods(modinstalldir, modlist, moddir):
+    dellst = []
+    templst = os.scandir(modinstalldir)
+    for i in templst:
+        if i.is_dir() and i not in modlist:
+            dellst.append(i.name)
+    if len(dellst) > 0:
+        print("Do you want to delete following folders from " + modinstalldir + " ? [y/n]")
+        for i in dellst:
+            print(i)
+        if input() == "y":
+            for i in dellst:
+                subprocess.check_call("cd " + modinstalldir + " && rm -rf " + i + "/", shell=True)
+                subprocess.check_call("cd " + moddir + " && rm -rf " + i + "/", shell=True)
+            print("Deleted " + str(len(dellst)) + " items successfully")
+    else: print ("No files are flagged for deletion.")
+    templst.close()
 
-#Step: Linking and renaming files into moddir
-log.info("The next step might require you to install xutils-dev, as it uses lndir.")
-subprocess.check_call("lndir " + moddir + "/steamapps/workshop/content/107410 " + moddir, shell=True)
-subprocess.check_call("cd "+ moddir +" && find . -maxdepth 4 -type l -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;")
+def formattedModStr(modlist, modrelpth):
+    tempstr = ""
+    for i in modlist:
+        tempstr += (modrelpth + i + ";")
+    print ("modtxt string:\n" + tempstr)
+
+def main():
+    if not (gameid and moddir):
+        print("You did not fill the top two entries of the config, which are essential for this script to run.")
+        sys.exit()
+    modinstalldir = moddir + "/steamapps/workshop/content/" + gameid
+
+    modstr = modString(gameid=gameid,modlist=modlist)
+    log.debug("Mod String: " + modstr)
+    if steamcmddir and modupdate:
+        runSteamcmd(steamcmddir=steamcmddir, moddir=moddir, modstr=modstr)
+    if steamcmdlogdir:
+        delSteamcmdLogs(steamcmdlogdir=steamcmdlogdir)
+    elif not (steamcmdlogdir and modupdate):
+        log.warning("steamcmdlogdir was not set in config. Logs will not be deleted.\n If you have provided login data, it will be in the logs.")
+    if modlinking:
+        linkMods(moddir=moddir, gameid=gameid)
+    if modcleaner:
+        cleanMods(modinstalldir=modinstalldir, modlist=modlist, moddir=moddir)
+    if modstrf:
+        formattedModStr(modlist=modlist, modrelpth=modrelpth)
+if __name__ == "__main__":
+    main()
