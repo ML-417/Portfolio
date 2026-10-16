@@ -1,10 +1,34 @@
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES   #installed via pycryptodome package
 from Crypto.Random import get_random_bytes
+import tarfile
 import os
-
+#TODO: encrypt runs but outputs file to local dir, maybe a problem with L9?
+    #TODO: decrypt not done.
+#TODO: split file merging (archiving) and single message mode
+    #TODO 1.1 create archiving mode (50% done)
+#TODO2: make run arguments usable
 thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory
 dname = os.path.dirname(thisfilespath)
 os.chdir(dname)
+
+def archive(source, filename):  #untested
+    if not filename:
+        filename = "encrypted.tar"
+        print("no file name given, using default.")
+    if os.path.isfile(filename):
+        print(filename + " already exists.")
+    else:
+        with tarfile.open(filename, "w") as tar:
+            tar.add(source, arcname=os.path.basename(source))
+        return filename
+            
+def dearchive(file):    #untested
+    if not file:
+        print("No file given")
+    tar = tarfile.open(file)
+    tar.extractall()
+    tar.close()
+        
 
 def encrypt(data):
 
@@ -45,12 +69,19 @@ def main():
     mode = input()
     if mode == "e":
         print("Encryption mode selected")
-        print("Please input the file path:")
-        print(encrypt(input()))
+        t = input("Please input the path you want to encrypt:\n") #var implementation untested
+        n = input("What should your encrypted file be called?\n")
+        n = archive(t,n)
+        print(encrypt(n))
+        del t,n
     elif mode == "d":
         print("Decryption mode selected")
-        print("Please input the file path, then the associated hex key:")
-        decrypt(data=input(), key=input())
+        print("Please input the file path you want to decrypt.")
+        t = input()
+        print("What is your hex key?")
+        decrypt(data= t, key=input())
+        del t
+        print("Decryption Successful")
     else:
         print("Wrong input! Exiting...")
 
