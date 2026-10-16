@@ -2,19 +2,19 @@ from Crypto.Cipher import AES   #installed via pycryptodome package
 from Crypto.Random import get_random_bytes
 import tarfile
 import os
-#TODO: encrypt runs but outputs file to local dir, maybe a problem with L9?
-    #TODO: decrypt not done.
-#TODO: split file merging (archiving) and single message mode
-    #TODO 1.1 create archiving mode (50% done)
-#TODO2: make run arguments usable
-thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory
+#TODO fix error on L85
+#TODO Last: make this a script runnable with args and help
+thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory - why again?
 dname = os.path.dirname(thisfilespath)
 os.chdir(dname)
 
-def archive(source, filename):  #untested
+def archive(source, filename:str):
+    os.chdir(source)
     if not filename:
-        filename = "encrypted.tar"
+        filename = "encrypted"
         print("no file name given, using default.")
+        
+    filename = filename + ".tar"
     if os.path.isfile(filename):
         print(filename + " already exists.")
     else:
@@ -22,7 +22,8 @@ def archive(source, filename):  #untested
             tar.add(source, arcname=os.path.basename(source))
         return filename
             
-def dearchive(file):    #untested
+def dearchive(file):
+    os.chdir(os.path.dirname(file))
     if not file:
         print("No file given")
     tar = tarfile.open(file)
@@ -32,13 +33,14 @@ def dearchive(file):    #untested
 
 def encrypt(data):
 
+    name = data
     data = open(data, "rb")
     data = data.read()
     key = get_random_bytes(32)
     cipher = AES.new(key, AES.MODE_EAX)
     ciphertext, tag = cipher.encrypt_and_digest(data)
 
-    with open("encrypted.bin", "wb") as f:
+    with open(name, "wb") as f:
         f.write(tag)
         f.write(cipher.nonce)
         f.write(ciphertext)
@@ -57,10 +59,10 @@ def decrypt(data,key):
     plaintext = cipher.decrypt(ciphertext)
     try:
         cipher.verify(tag)
-        print("Message decrypted!")
+        print("decrypted!")
     except ValueError:
         print("Key incorrect or message corrupted")
-    with open("decrypted.txt", "wb") as f:
+    with open(data, "wb") as f:
         f.write(plaintext)
 
 def main():
@@ -80,6 +82,7 @@ def main():
         t = input()
         print("What is your hex key?")
         decrypt(data= t, key=input())
+        dearchive(t)    #some error remaining
         del t
         print("Decryption Successful")
     else:
