@@ -2,7 +2,6 @@ from Crypto.Cipher import AES   #installed via pycryptodome package
 from Crypto.Random import get_random_bytes
 import tarfile
 import os
-#TODO fix error on L85
 #TODO Last: make this a script runnable with args and help
 thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory - why again?
 dname = os.path.dirname(thisfilespath)
@@ -71,7 +70,7 @@ def main():
     mode = input()
     if mode == "e":
         print("Encryption mode selected")
-        t = input("Please input the path you want to encrypt:\n") #var implementation untested
+        t = input("Please input the path you want to encrypt:\n")
         n = input("What should your encrypted file be called?\n")
         n = archive(t,n)
         print(encrypt(n))
@@ -82,7 +81,7 @@ def main():
         t = input()
         print("What is your hex key?")
         decrypt(data= t, key=input())
-        dearchive(t)    #some error remaining
+        dearchive(t)
         del t
         print("Decryption Successful")
     else:
