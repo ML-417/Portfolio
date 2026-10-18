@@ -2,7 +2,9 @@ from Crypto.Cipher import AES   #installed via pycryptodome package
 from Crypto.Random import get_random_bytes
 import tarfile
 import os
-#TODO Last: make this a script runnable with args and help
+import argparse
+
+#TODO edit main function for args, immediate steps are in comments.
 thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory - why again?
 dname = os.path.dirname(thisfilespath)
 os.chdir(dname)
@@ -37,7 +39,7 @@ def encrypt(data):
     data = data.read()
     key = get_random_bytes(32)
     cipher = AES.new(key, AES.MODE_EAX)
-    ciphertext, tag = cipher.encrypt_and_digest(data)
+    ciphertext, tag = cipher.encrypt_and_digest(data)   
 
     with open(name, "wb") as f:
         f.write(tag)
@@ -65,17 +67,18 @@ def decrypt(data,key):
         f.write(plaintext)
 
 def main():
-    print("You have started the AES cipher")
-    print("Do you wish to [e]ncrypt or [d]ecrypt?")
-    mode = input()
-    if mode == "e":
-        print("Encryption mode selected")
-        t = input("Please input the path you want to encrypt:\n")
-        n = input("What should your encrypted file be called?\n")
+    parser = argparse.ArgumentParser()  #does this have help already?
+    parser.add_argument("mode",choices=["e", "encrypt", "d", "decrypt"], help="select encryption or decryption mode")
+    parser.add_argument("path", help="always a path")   #change this help
+    parser.add_argument("key", help="a key to your encrypted file in hex format")   #make this not always necessary
+    args = parser.parse_args()
+    if args.mode == "e" or "encrypt":
+        t = args.path
+        n = input("What should your encrypted file be called?\n")   #remove this.
         n = archive(t,n)
         print(encrypt(n))
         del t,n
-    elif mode == "d":
+    elif args.mode == "d" or "decrypt":
         print("Decryption mode selected")
         print("Please input the file path you want to decrypt.")
         t = input()
