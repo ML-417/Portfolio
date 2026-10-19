@@ -4,7 +4,7 @@ import tarfile
 import os
 import argparse
 
-#TODO edit main function for args, immediate steps are in comments.
+#TODO remove remnants of manual file naming, maybe add an optional arg for that
 thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory - why again?
 dname = os.path.dirname(thisfilespath)
 os.chdir(dname)
@@ -67,25 +67,20 @@ def decrypt(data,key):
         f.write(plaintext)
 
 def main():
-    parser = argparse.ArgumentParser()  #does this have help already?
+    parser = argparse.ArgumentParser()
     parser.add_argument("mode",choices=["e", "encrypt", "d", "decrypt"], help="select encryption or decryption mode")
     parser.add_argument("path", help="always a path")   #change this help
-    parser.add_argument("key", help="a key to your encrypted file in hex format")   #make this not always necessary
+    parser.add_argument("key",nargs="?", help="a key to your encrypted file in hex format")   #make this not always necessary
     args = parser.parse_args()
-    if args.mode == "e" or "encrypt":
-        t = args.path
+    path = args.path
+    if args.mode == ("e" or "encrypt"):
         n = input("What should your encrypted file be called?\n")   #remove this.
-        n = archive(t,n)
+        n = archive(path,n)
         print(encrypt(n))
-        del t,n
-    elif args.mode == "d" or "decrypt":
-        print("Decryption mode selected")
-        print("Please input the file path you want to decrypt.")
-        t = input()
-        print("What is your hex key?")
-        decrypt(data= t, key=input())
-        dearchive(t)
-        del t
+        del n
+    elif args.mode == ("d" or "decrypt"):
+        decrypt(data=path, key=args.key)
+        dearchive(path)
         print("Decryption Successful")
     else:
         print("Wrong input! Exiting...")
