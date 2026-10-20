@@ -3,8 +3,9 @@ from Crypto.Random import get_random_bytes
 import tarfile
 import os
 import argparse
-#TODO doesn't work with spaces in file path due to argparse, please fix
+#TODO MemoryError on decrypt L70
 #TODO optional naming arg
+#Note: There is no debugger present, handling debugging with print statements is really tedious.
 
 thisfilespath = os.path.abspath(__file__)   #change working directory to this file's directory - why again?
 dname = os.path.dirname(thisfilespath)
@@ -12,7 +13,7 @@ os.chdir(dname)
 #argument parsing
 parser = argparse.ArgumentParser()
 parser.add_argument("mode",choices=["e", "encrypt", "d", "decrypt"], help="select encryption or decryption mode")
-parser.add_argument("path", help="always a path")   #change this help
+parser.add_argument("path", help="input your file/directory path in quotation marks")
 parser.add_argument("key",nargs="?", help="a key to your encrypted file in hex format")
 parser.add_argument("-o", "--overwrite", action="store_true")   #stores in args.overwrite
 args = parser.parse_args()
@@ -22,7 +23,7 @@ def archive(source):
     filename = "encrypted.tar"
     if os.path.isfile(filename):    #duplicate handling
         if not args.overwrite:   
-            i = input(filename + " already exists. Overwrite existing file? [y/n]")
+            i = input(filename + " already exists. Overwrite existing file? [y/n]\n")
             if i == "y":
                 os.remove(filename)
             elif i == "n":
@@ -33,10 +34,11 @@ def archive(source):
                 return 1
         else:
             os.remove(filename)
-    else:   #main part of function
-        with tarfile.open(filename, "w") as tar:
-            tar.add(source, arcname=os.path.basename(source))
-        return filename
+    #main part of function
+    print("archiving...")
+    with tarfile.open(filename, "w") as tar:
+        tar.add(source, arcname=os.path.basename(source))
+    return filename
             
 def dearchive(file):
     os.chdir(os.path.dirname(file))
@@ -47,6 +49,7 @@ def dearchive(file):
     tar.close()
 
 def encrypt(data):
+    print("encrypting...")
     name = data
     data = open(data, "rb")
     data = data.read()
@@ -71,7 +74,7 @@ def decrypt(data,key):
         cipher.verify(tag)
         print("decrypted!")
     except ValueError:
-        print("Key incorrect or message corrupted")
+        print("Key incorrect or file corrupted")
     with open(data, "wb") as f:
         f.write(plaintext)
 
@@ -79,14 +82,14 @@ def main():
     path = args.path
     if args.mode == ("e" or "encrypt"):
         n = archive(path)
-        print(encrypt(n))
+        print("Your hex key:" + encrypt(n))
         del n
-    elif args.mode == ("d" or "decrypt"):
+    elif args.mode == ("d" or "decrypt") and args.key:
         decrypt(data=path, key=args.key)
         dearchive(path)
         print("Decryption Successful")
     else:
-        print("How did we get here?")   #should be impossible
+        print("No hex key supplied. Exiting...")
 
 if __name__ == '__main__':
     main()
