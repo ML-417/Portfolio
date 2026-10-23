@@ -1,0 +1,11 @@
+C:\Users\setar\source\repos\Scheduler\bin\Debug\Scheduler.exe.config
+C:\Users\setar\source\repos\Scheduler\bin\Debug\Scheduler.exe
+C:\Users\setar\source\repos\Scheduler\bin\Debug\Scheduler.pdb
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.csproj.AssemblyReference.cache
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.Properties.Resources.resources
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.csproj.GenerateResource.cache
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.csproj.CoreCompileInputs.cache
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.exe
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.pdb
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.exe.config
+C:\Users\setar\source\repos\Scheduler\obj\Debug\Scheduler.Calendar.resources
