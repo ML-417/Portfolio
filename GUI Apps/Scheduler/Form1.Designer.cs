@@ -54,11 +54,12 @@
             this.ColumnFriday,
             this.ColumnSaturday,
             this.ColumnSunday});
-            this.SchedulingDGrid.Location = new System.Drawing.Point(248, 267);
+            this.SchedulingDGrid.Location = new System.Drawing.Point(220, 214);
+            this.SchedulingDGrid.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SchedulingDGrid.Name = "SchedulingDGrid";
             this.SchedulingDGrid.RowHeadersWidth = 62;
             this.SchedulingDGrid.RowTemplate.Height = 28;
-            this.SchedulingDGrid.Size = new System.Drawing.Size(1116, 349);
+            this.SchedulingDGrid.Size = new System.Drawing.Size(992, 279);
             this.SchedulingDGrid.TabIndex = 1;
             // 
             // ColumnMonday
@@ -120,37 +121,42 @@
             // 
             // TaskTbx
             // 
-            this.TaskTbx.Location = new System.Drawing.Point(465, 702);
+            this.TaskTbx.Location = new System.Drawing.Point(413, 562);
+            this.TaskTbx.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TaskTbx.Name = "TaskTbx";
-            this.TaskTbx.Size = new System.Drawing.Size(250, 26);
+            this.TaskTbx.Size = new System.Drawing.Size(223, 22);
             this.TaskTbx.TabIndex = 2;
             // 
             // SubmitBtn
             // 
             this.SubmitBtn.AllowDrop = true;
-            this.SubmitBtn.Location = new System.Drawing.Point(956, 698);
+            this.SubmitBtn.Location = new System.Drawing.Point(850, 558);
+            this.SubmitBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SubmitBtn.Name = "SubmitBtn";
-            this.SubmitBtn.Size = new System.Drawing.Size(84, 37);
+            this.SubmitBtn.Size = new System.Drawing.Size(75, 30);
             this.SubmitBtn.TabIndex = 3;
             this.SubmitBtn.Text = "Submit";
             this.SubmitBtn.UseVisualStyleBackColor = true;
+            this.SubmitBtn.Click += new System.EventHandler(this.SubmitBtn_Click);
             // 
             // TimeNud
             // 
-            this.TimeNud.Location = new System.Drawing.Point(779, 703);
+            this.TimeNud.Location = new System.Drawing.Point(692, 562);
+            this.TimeNud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TimeNud.Name = "TimeNud";
-            this.TimeNud.Size = new System.Drawing.Size(120, 26);
+            this.TimeNud.Size = new System.Drawing.Size(107, 22);
             this.TimeNud.TabIndex = 4;
             // 
             // Calendar
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1553, 925);
+            this.ClientSize = new System.Drawing.Size(1380, 740);
             this.Controls.Add(this.TimeNud);
             this.Controls.Add(this.SubmitBtn);
             this.Controls.Add(this.TaskTbx);
             this.Controls.Add(this.SchedulingDGrid);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Calendar";
             this.Text = "Calendar";
             this.Load += new System.EventHandler(this.Calendar_Load);

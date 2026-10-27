@@ -17,10 +17,18 @@ namespace Scheduler
             InitializeComponent();
         }
 
-        private void Calendar_Load(object sender, EventArgs e)
+        public void Scheduler()
         {
-            SchedulingDGrid.Rows.Add(8);
+            int days = 7;
+            int hours = 8;
+            string [,] week = new string[days, hours];  //might work?
         }
 
+        private void Calendar_Load(object sender, EventArgs e){}
+
+        private void SubmitBtn_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
